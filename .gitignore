@@ -1,0 +1,5 @@
+.DS_Store
+# Listening audio (~1.9GB) is served from the fuck-tcf.xyz Cloudflare Worker CDN;
+# we keep the local copy for cross-verification and as a scratch cache but never
+# ship it in the site repo.
+audio/

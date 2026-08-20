@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TCF · ⚡ Cram (recognition drill)</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="googlebot" content="noindex, nofollow">
+<script>/* apply saved theme before paint */
+  (function(){var t=localStorage.getItem('theme'); if(t) document.documentElement.setAttribute('data-theme', t);})();
+</script>
+<link rel="stylesheet" href="style.css?v=1">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f232a">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TCF Cram">
+</head>
+<body class="cram-body">
+<div id="cram">
+  <header class="cram-bar">
+    <div class="cram-bar-top">
+      <h1>TCF</h1>
+      <div class="modenav">
+        <a class="modetab active" href="cram.html">⚡ Cram</a>
+        <a class="modetab" href="drill.html">🎯 Drill</a>
+      </div>
+      <button id="theme-toggle" class="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">☾</button>
+    </div>
+    <div class="cram-controls" id="controls">
+      <div class="cram-scope" id="scope"></div>
+      <span class="cram-sep"></span>
+      <button class="chip toggle" id="t-reveal" title="Show the correct answer immediately (skip the reveal tap)">👁 Answers</button>
+      <button class="chip toggle" id="t-timer" title="After 10s reveal the answer, then 10s later go to the next card">⏱ 10s</button>
+      <button class="chip toggle" id="t-shuffle" title="Random order — reshuffles each pass">🔀 Shuffle</button>
+      <button class="chip toggle" id="t-fr" title="Hide the English translations">🇫🇷 FR only</button>
+      <button class="chip toggle" id="t-hidknown" title="Skip cards you've marked ‘Got it’">★ Hide known</button>
+    </div>
+    <div class="cram-cefr" id="cefr"></div>
+    <div class="cram-status">
+      <div class="cram-progress"><div class="cram-progress-fill" id="progress-fill"></div></div>
+      <div class="cram-stat" id="stat"></div>
+      <button class="cram-reset" id="reset" title="Start this set from the beginning">↺ Restart</button>
+    </div>
+    <div class="cram-timerbar" id="timerbar"><div class="cram-timerbar-fill" id="timerfill"></div></div>
+  </header>
+
+  <main class="cram-stage" id="stage">
+    <button class="cram-arrow prev" id="prev" title="Previous (←)" aria-label="Previous">‹</button>
+    <div class="cram-card-wrap" id="card-wrap"><!-- card injected here --></div>
+    <button class="cram-arrow next" id="next-arrow" title="Next (→)" aria-label="Next">›</button>
+  </main>
+
+  <footer class="cram-actions">
+    <button class="cram-act back" id="back" title="Previous card (←)">‹ Back</button>
+    <button class="cram-act star" id="star" title="Mark as known — hide it later with ‘★ Hide known’ (K)">★ Got it</button>
+    <button class="cram-act primary" id="primary">Reveal</button>
+  </footer>
+
+  <div class="cram-hint" id="hint">Tap the card (or <b>Reveal</b>) to show the answer · tap again for the next · ← / → to move</div>
+</div>
+
+<script src="data.js?v=1"></script>
+<script src="cram.js?v=1"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
+</script>
+</body>
+</html>
