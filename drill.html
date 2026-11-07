@@ -36,6 +36,7 @@
       <button class="chip toggle" id="t-hidknown" title="Skip cards you've marked ‘Got it’">★ Hide known</button>
       <button class="chip toggle" id="t-autoplay" title="Start the recording automatically when a new one loads (listening cards only)">▶ Autoplay</button>
     </div>
+    <div class="cram-cefr" id="level"></div>
     <div class="cram-cefr" id="cefr"></div>
     <div class="cram-status">
       <div class="cram-progress"><div class="cram-progress-fill" id="progress-fill"></div></div>
@@ -65,7 +66,7 @@
 </div>
 
 <script src="data.js?v=4"></script>
-<script src="drill.js?v=2"></script>
+<script src="drill.js?v=3"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {

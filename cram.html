@@ -38,6 +38,7 @@
       <button class="chip toggle" id="t-fr" title="Hide the English translations">🇫🇷 FR only</button>
       <button class="chip toggle" id="t-hidknown" title="Skip cards you've marked ‘Got it’">★ Hide known</button>
     </div>
+    <div class="cram-cefr" id="level"></div>
     <div class="cram-cefr" id="cefr"></div>
     <div class="cram-status">
       <div class="cram-progress"><div class="cram-progress-fill" id="progress-fill"></div></div>
@@ -63,7 +64,7 @@
 </div>
 
 <script src="data.js?v=4"></script>
-<script src="cram.js?v=2"></script>
+<script src="cram.js?v=3"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {

@@ -22,7 +22,7 @@
   paintThemeIcon();
 
   /* ---- settings (persisted, separate from cram's) ---- */
-  var S = { subject: 'all', section: 'all', shuffle: false, hidknown: false, autoplay: true };
+  var S = { subject: 'all', section: 'all', level: 'all', shuffle: false, hidknown: false, autoplay: true };
   try { var saved = JSON.parse(localStorage.getItem('drill-tcf-set') || '{}'); for (var k in saved) if (k in S) S[k] = saved[k]; } catch (e) {}
   function saveSettings() { try { localStorage.setItem('drill-tcf-set', JSON.stringify(S)); } catch (e) {} }
 
@@ -75,6 +75,7 @@
     if (S.section === 'all') return true;
     return String(c.p.section) === String(S.section);
   }
+  function inLevel(c) { return S.level === 'all' || c.p.cefr === S.level; }
   function baseSort(a, b) {
     var sa = a.subject === 'listening' ? 0 : 1, sb = b.subject === 'listening' ? 0 : 1;
     if (sa !== sb) return sa - sb;
@@ -92,6 +93,7 @@
     var keep = CARDS.filter(function (c) {
       if (!inSubject(c)) return false;
       if (!inSection(c)) return false;
+      if (!inLevel(c)) return false;
       if (S.hidknown && KNOWN[c.qref]) return false;
       return true;
     });
@@ -151,6 +153,7 @@
 
     // meta line
     var meta = el('div', 'cr-meta');
+    if (c.p.cefr) meta.appendChild(el('span', 'cr-cefr', c.p.cefr));
     meta.appendChild(el('span', 'cr-src', srcLabel(c)));
     var knownBadge = el('span', 'cr-known', '★ known');
     knownBadge.style.display = KNOWN[c.qref] ? '' : 'none';
@@ -372,7 +375,7 @@
     SCOPES.forEach(function (d) {
       var counts = CARDS.filter(function (c) { return d[0] === 'all' ? true : c.subject === d[0]; }).length;
       var b = el('button', 'chip' + (S.subject === d[0] ? ' on' : ''), d[1] + ' ' + counts);
-      b.addEventListener('click', function () { if (S.subject === d[0]) return; S.subject = d[0]; S.section = 'all'; saveSettings(); renderScope(); renderSections(); buildDeck(); idx = 0; sess = { right: 0, wrong: 0 }; renderCard(); });
+      b.addEventListener('click', function () { if (S.subject === d[0]) return; S.subject = d[0]; S.section = 'all'; saveSettings(); renderScope(); renderSections(); renderLevels(); buildDeck(); idx = 0; sess = { right: 0, wrong: 0 }; renderCard(); });
       scopeEl.appendChild(b);
     });
   }
@@ -384,12 +387,13 @@
     CARDS.forEach(function (c) {
       if (subj && c.subject !== subj) return;
       var s = c.p.section; if (s == null) return;
-      secs[s] = (secs[s] || 0) + 1;
+      if (!(s in secs)) secs[s] = 0;   // keep every section chip, even at 0 for this level
+      if (inLevel(c)) secs[s]++;
     });
     return Object.keys(secs).sort(function (a, b) { return +a - +b; }).map(function (k) { return [k, +secs[k]]; });
   }
   function renderSections() {
-    var sc = CARDS.filter(inSubject);
+    var sc = CARDS.filter(function (c) { return inSubject(c) && inLevel(c); });
     cefrEl.innerHTML = '';
     cefrEl.appendChild(el('span', 'cram-row-lbl', 'Section'));
     var buttons = [['all', 'All ' + sc.length]].concat(sectionsForSubject().map(function (d) { return [String(d[0]), 'Section ' + d[0] + ' · ' + d[1]]; }));
@@ -397,10 +401,31 @@
       var b = el('button', 'chip' + (String(S.section) === d[0] ? ' on' : ''), d[1]);
       b.addEventListener('click', function () {
         if (String(S.section) === d[0]) return;
-        S.section = d[0]; saveSettings(); renderSections();
+        S.section = d[0]; saveSettings(); renderSections(); renderLevels();
         buildDeck(); idx = 0; sess = { right: 0, wrong: 0 }; renderCard();
       });
       cefrEl.appendChild(b);
+    });
+  }
+
+  // CEFR level filter (A1-C2, from the source data) — counts reflect subject + section
+  var levelEl = document.getElementById('level');
+  var BANDS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+  function renderLevels() {
+    if (!levelEl) return;
+    var sc = CARDS.filter(function (c) { return inSubject(c) && inSection(c); });
+    var counts = {}; BANDS.forEach(function (b) { counts[b] = 0; });
+    sc.forEach(function (c) { if (counts[c.p.cefr] != null) counts[c.p.cefr]++; });
+    levelEl.innerHTML = '';
+    levelEl.appendChild(el('span', 'cram-row-lbl', 'Level'));
+    [['all', 'All ' + sc.length]].concat(BANDS.map(function (b) { return [b, b + ' ' + counts[b]]; })).forEach(function (d) {
+      var b = el('button', 'chip' + (S.level === d[0] ? ' on' : ''), d[1]);
+      b.addEventListener('click', function () {
+        if (S.level === d[0]) return;
+        S.level = d[0]; saveSettings(); renderLevels(); renderSections();
+        buildDeck(); idx = 0; sess = { right: 0, wrong: 0 }; renderCard();
+      });
+      levelEl.appendChild(b);
     });
   }
   function bindToggle(id, key) {
@@ -419,6 +444,7 @@
     var keys = ['shuffle','hidknown','autoplay'];
     ids.forEach(function (id, i) { var el2 = document.getElementById(id); if (el2) el2.classList.toggle('on', !!S[keys[i]]); });
     renderScope();
+    renderLevels();
     renderSections();
   }
   bindToggle('t-shuffle', 'shuffle');
