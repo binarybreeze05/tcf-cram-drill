@@ -29,13 +29,17 @@
   var KNOWN = {};
   try { (JSON.parse(localStorage.getItem('cram-tcf-known') || '[]') || []).forEach(function (q) { KNOWN[q] = 1; }); } catch (e) {}
   function saveKnown() { try { localStorage.setItem('cram-tcf-known', JSON.stringify(Object.keys(KNOWN))); } catch (e) {} }
+  /* ---- repeated questions were merged into one card: move saved marks onto the kept card ---- */
+  var ALIAS = window.QREF_ALIAS || {};
+  (function () { var moved = false; for (var q in KNOWN) if (ALIAS[q]) { KNOWN[ALIAS[q]] = 1; delete KNOWN[q]; moved = true; } if (moved) saveKnown(); })();
 
   /* ---- helpers ---- */
   function qnum(qref) { var m = (qref || '').match(/#Q?(\d+)/); return m ? m[1] : ''; }
   function testNum(p) { return p.testNum || 0; }
+  function testName(p) { return p.testLabel || ('Test ' + testNum(p)); }
   function srcLabel(c) {
     var sub = c.p.subject === 'listening' ? '🎧' : '📖';
-    return sub + ' Test ' + testNum(c.p) + ' · §' + (c.p.section || '?') + ' · Q' + qnum(c.q.qref);
+    return sub + ' ' + testName(c.p) + ' · §' + (c.p.section || '?') + ' · Q' + qnum(c.q.qref) + (c.p.seenIn > 1 ? ' · in ' + c.p.seenIn + ' tests' : '');
   }
   function isLetter(o) { return o && !o.is_img && typeof o.fr === 'string' && o.fr.trim().length <= 2 && (!o.en || o.en.trim() === o.fr.trim()); }
 
@@ -92,6 +96,7 @@
     if (S.shuffle) shuffleInPlace(keep); else keep.sort(baseSort);
     DECK = keep;
     var want = preserveQref || localStorage.getItem('cram-tcf-pos');
+    if (want && ALIAS[want]) want = ALIAS[want];
     idx = 0;
     if (want) { for (var i = 0; i < DECK.length; i++) if (DECK[i].qref === want) { idx = i; break; } }
     if (idx >= DECK.length) idx = 0;
