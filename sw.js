@@ -1,9 +1,9 @@
 // Minimal service worker: installable PWA + offline app-shell.
 // Network-first for shell/data (stays fresh), cache fallback (offline). MP3s skip
 // the SW so the browser keeps native range-request streaming/seeking.
-const CACHE = 'tcf-cram-drill-v3';
+const CACHE = 'tcf-cram-drill-v4';
 const SHELL = ['./', './cram.html', './drill.html',
-               './style.css?v=1', './cram.js?v=2', './drill.js?v=2', './data.js?v=3',
+               './style.css?v=1', './cram.js?v=2', './drill.js?v=2', './data.js?v=4',
                './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {
